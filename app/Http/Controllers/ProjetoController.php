@@ -25,7 +25,6 @@ class ProjetoController extends Controller {
 
         File::copyDirectory(Storage::disk('webstrates')->path('') . $caminhoTemplate, Storage::disk('webstrates')->path('') . $nomeProjeto);
         
-        $strGitIgnore = "!.git"
         
         Storage::disk('webstrates')->put();
         //  dd();
