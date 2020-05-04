@@ -1,4 +1,4 @@
-
+var totalElementos = 0;
 
 var setupElements = function () {
 
@@ -85,7 +85,11 @@ var makeDropableElement = function (element) {
             var newTop = draggableOffset.top - droppableOffset.top;
 
             webstrate.dataSaved().then(()=>{
-                elementToAppend.appendTo($(this)).css({ top: newTop + "px", left: newLeft + "px" });
+                if (ui.draggable.hasClass("newMockElement")) {
+                    elementToAppend.appendTo($(this)).css({ top: newTop + "px", left: newLeft + "px" });
+                } else {
+                    setupElements();
+                }
             });
             // if(element.hasOwnProperty('webstrate') ){
             //     console.log('--------------------------------------------------------------------------------')
@@ -424,6 +428,15 @@ function saveDocumentCode() {
 //START
 // 
 webstrate.on("loaded", function () {
-    //  alert('loaded webstrates');
     setupElements();
-})
+    totalElementos = $(".mockElement").length;
+});
+
+$('body').on('DOMSubtreeModified', '#canvasWrap', function(){
+    if ($(".mockElement").length > totalElementos) {
+        totalElementos = $(".mockElement").length;
+        setTimeout(function(){
+            setupElements();
+        }, 4);
+    }
+});
