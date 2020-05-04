@@ -1,0 +1,1032 @@
+<html __wid="nvVCrgP7"><head __wid="njt9nnPv">
+        <title __wid="ngyB7UH9">quickMockup</title>
+        <meta charset="UTF-8" __wid="dncx26D7"/>
+        <meta name="description" content __wid="4FuAYDRj"/>
+        <meta name="keywords" content __wid="DTV3iABt"/>
+        <script src="http://localhost/quickMockup/scripts/jquery.js" __wid="EJVsCpNb"></script>
+        <script src="http://localhost/quickMockup/scripts/jquery-ui.js" __wid="HyysD8TQ"></script>
+        <script src="http://localhost/quickMockup/scripts/showdown.js" __wid="tcbS5VQU"></script>
+        <script src="http://localhost/quickMockup/scripts/showdownUIExtensions.js" __wid="P8GWSdcL"></script>
+        <script src="http://localhost/quickMockup/scripts/mousetrap.js" __wid="7SMpAhev"></script>
+        <script src="http://localhost/quickMockup/scripts/filereader.js" __wid="UGy7FzB4"></script>
+        <script src="http://localhost/quickMockup/scripts/FileSaver.js" __wid="WWmVyFdR"></script>
+
+        <script src="http://localhost/quickMockup/scripts/jqUiEditMD2HTML.js" __wid="u2RNtJe6"></script>
+
+        <link href="http://localhost/quickMockup/styles/jquery-ui.css" rel="stylesheet" __wid="C93CH9iC"/>
+
+        <link href="http://localhost/quickMockup/styles/fontawesome-free-5.13.0-web/css/all.css" rel="stylesheet" __wid="4fVLpydN"/> 
+        <link href="http://localhost/quickMockup/styles/custom.css" rel="stylesheet" __wid="wJiFR3n4"/> 
+        <style __wid="ufxyBcCH">
+            #toolbar, #widgetCollectionWrap{display:none;}
+
+            body, div{
+                padding:0;
+                margin:0;
+            }
+
+            #canvas .custom-selected.ui-resizable>.ui-resizable-handle{
+                pointer-events: auto;
+                background: rgba(0,0,0,0); /*the following stylesheet shows these again. If only html is saved (and the mockup not interactive thus, they are hidden)*/
+            }
+
+            #canvasWrap{
+                background-color: gray;
+            }
+
+            #canvas{
+                background-color: white;
+            }
+
+
+
+        </style>
+        <link href="http://localhost/quickMockup/styles/quickMockupInteractive.css" rel="stylesheet" __wid="hu9KKhW6"/>
+
+        <!--elements -->
+        <!-- style has an ID so we can retrieve it for exporting html and css via a script reading the innerHTML of the style -->
+        <style id="elementStyles" __wid="G2CraWYK">
+            /*all*/
+            .newMockElement, .mockElement{
+                box-sizing: border-box;
+                font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+                position: relative;
+                background:rgba(255,255,255,0.8);
+                width:10em;
+            }
+            .newMockElement > div.editableArea, .mockElement > div.editableArea{
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .newMockElement a, .mockElement a{
+                color: #0093ff;
+                pointer-events: none; /*otherwise, links in elements, markdown etc. can be clicked and lead away from the app.*/
+            }
+            .newMockElement a, .mockElement a:visited{
+                color: #0093ff /*no visted state for mockup links*/
+            }
+
+
+            .editableArea>p{
+                margin: 0 0 0 0;
+                padding: 0 0 0 0;
+            }
+
+            /*buttons*/
+            .newMockElement.button, .mockElement.button{
+                justify-content: center;
+                align-items: center;
+                display: flex;
+                border:2px solid #333;
+                border-radius:3px;
+                background:white;
+                width: 8em;
+                width: 8em;
+                height:3em;
+                box-shadow: 2px 2px rgba(0, 0, 0, 0.5);
+            }
+
+            /*Window*/
+            .newMockElement.dialogWindow, .mockElement.dialogWindow{
+                border:2px solid gray;
+                border-radius:3px;
+                width: 400px;
+                height:200px;
+            }
+
+            .newMockElement.dialogWindow > .dialogWindow-bar, .mockElement.dialogWindow > .dialogWindow-bar{
+                background-color:silver;
+                border-bottom: 2px solid #333;
+                border-radius: 3px;
+                padding:7px;
+                height:1.6em;
+            }
+
+            .newMockElement.dialogWindow > div > .dialogWindow-closeButton, .mockElement.dialogWindow > div > .dialogWindow-closeButton{
+                padding:4px;
+                font-size:1.5em;
+                margin-top: -0.4em;
+                float:right;
+            }
+
+            /*tabs*/
+            .newMockElement.tabs, .mockElement.tabs{
+                background: rgba(0,0,0,0);
+                width:30em;
+                border-bottom:1px solid rgba(0,0,0,0.3);
+            }
+
+            .newMockElement.tabs>.editableArea, .mockElement.tabs>.editableArea{
+                border-bottom: 2px solid gray;
+                background: rgba(0,0,0,0);
+                box-sizing: border-box;
+                width:100%;
+                margin:0;
+            }
+
+            .newMockElement.tabs>.editableArea a, .mockElement.tabs>.editableArea a{
+                pointer-events: none; /*prevent accidental navigation*/
+            }
+
+            .newMockElement.tabs>.editableArea>ul, .mockElement.tabs>.editableArea>ul{
+                box-sizing: border-box;
+                width:100%;
+                margin:0;
+                padding:0;
+            }
+
+            .newMockElement.tabs>.editableArea>ul>li, .mockElement.tabs> .editableArea>ul>li{
+                display: inline-block;
+                padding: 5px 16px;
+                border: 1px solid gray;
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+                margin: 0 0 -2px 0.3em;
+                font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+                background:white;
+            }
+
+            .mockElement.tabs>.editableArea>ul>li.item-highlighted, .newMockElement.tabs>.editableArea>ul>li.item-highlighted{
+                background: #DDD;
+            }
+
+            .newMockElement.label .mockElement.label{
+                width:7em;
+                background-color: transparent;
+            }
+
+            .newMockElement.link, .mockElement.link{
+                width:7em;
+                color:#0093ff;
+                text-decoration: underline;
+            }
+
+            /*headline*/
+            .newMockElement.headline>h1, .mockElement.headline>h1{
+                margin:0;
+                background-color: transparent;
+            }
+            /*paragraph*/
+            .newMockElement.paragraph>p{
+                margin:0;
+            }
+
+            /*table*/
+            .newMockElement.table, .mockElement.table{
+                width:10em;
+            }
+            .newMockElement.table table, .mockElement.table table{
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .newMockElement.table table td, .mockElement.table table td, .newMockElement.table table th, .mockElement.table table th{
+                border: 1px solid gray;
+            }
+
+            .newMockElement.table table th, .mockElement.table table th{
+                border-bottom: 2px solid black;
+            }
+
+            /*just a rectangle*/
+            .newMockElement.rect , .mockElement.rect{
+                border:2px solid rgba(0,0,0,0.8);
+                width:200px;
+                height:50px;
+                background-color: transparent;
+            }
+
+            .newMockElement.grayrect , .mockElement.grayrect{
+                border:2px solid #333;
+                width:200px;
+                height:50px;
+                background-color: lightgrey;
+            }
+
+            .newMockElement.invisiblerect, .mockElement.invisiblerect {
+                width:200px;
+                height:50px;
+                background-color: transparent;
+                margin:2px;
+            }
+
+            .mockElement.invisiblerect > .desc {
+                display:none;
+            }
+
+            .newMockElement.invisiblerect, .mockElement.invisiblerect:hover, .mockElement.invisiblerect.custom-selected {
+                border:2px solid lightgrey;
+                margin:0;
+            }
+
+            .newMockElement.whiterect , .mockElement.whiterect{
+                border:2px solid rgba(150,150,150,0.05);
+                width:200px;
+                height:50px;
+                background-color: white;
+            }
+
+
+            /*optionlist*/
+
+            .newMockElement.optionRadiobutton , .mockElement.optionRadiobutton{
+                box-sizing: border-box;
+                background-color: transparent;
+            }
+
+            .newMockElement.optionRadiobutton .editableArea li, .mockElement.optionRadiobutton .editableArea li{
+                display: block;
+            }
+
+            .newMockElement.optionRadiobutton ul, .mockElement.optionRadiobutton ul{
+                margin:0;
+                padding: 0;
+            }
+
+            .newMockElement.optionRadiobutton .editableArea li::before, .mockElement.optionRadiobutton .editableArea li::before{
+                /*implements a simulated radio button, since uiconde circles and the "fisheye" character were inconsisted in size*/
+                content: " ";
+                display: inline-block;
+                background: white;
+                width: 0.8em;
+                height: 0.8em;
+                position: relative;
+                top: 0.1em;
+                margin: 0 0.3em 0 0;
+                padding: 0;
+                border-radius: 10em;
+                border: 2px inset gray;
+                box-sizing: border-box;
+            }
+
+            .newMockElement.optionRadiobutton .editableArea li.item-highlighted::before, .mockElement.optionRadiobutton .editableArea li.item-highlighted::before{
+                content: "";
+                background: black;
+                background-clip: content-box;
+                padding: 0.1em;
+            }
+
+            /*Checkboxes*/
+            .newMockElement.optionCheckbox , .mockElement.optionCheckbox{
+                box-sizing: border-box;
+            }
+
+            .newMockElement.optionCheckbox .editableArea li, .mockElement.optionCheckbox .editableArea li{
+                display: block;
+            }
+
+            .newMockElement.optionCheckbox ul, .mockElement.optionCheckbox ul{
+                margin:0;
+                padding: 0;
+            }
+
+
+            .newMockElement.optionCheckbox .editableArea li::before, .mockElement.optionCheckbox .editableArea li::before{
+                content:"☐ "
+            }
+
+            .newMockElement.optionCheckbox .editableArea li.item-highlighted::before, .mockElement.optionCheckbox .editableArea li.item-highlighted::before{
+                content:"☑ ";
+            }
+
+            /*Dropdown*/
+            .dropdownList{
+                border:2px solid gray;
+                border-radius: 3px;
+                padding: 0px 0 0px 0.4em;
+                display: table;
+                background-color: white;
+            }
+
+            .dropdownList .editableArea{
+                display: table-cell;
+                text-align: center;
+                height: 100%;
+                vertical-align: middle;
+            }
+
+            .dropdownList .mockelement-dropdown-arrow{
+                border-left: 1px solid rgb(128, 128, 128);
+                padding: 0px 0.4em;
+                display: table-cell;
+                text-align: center;
+                height: 100%;
+                vertical-align: middle;
+                background: #EEE;
+
+
+            }
+            /*input Box*/
+            .newMockElement.inputbox, .mockElement.inputbox{
+                border:2px solid darkgray;
+                align-items: center;
+                display: flex;
+                border:2px solid #333;
+                padding-left:0.4em;
+            }
+
+            /*spinner*/
+            .newMockElement.spinner, .mockElement.spinner{
+                border:2px solid darkgray;
+                justify-content: center;
+                align-items: center;
+                display: flex;
+                border:2px solid #333;
+                background-color: white;
+            }
+
+            .newMockElement.spinner::before, .mockElement.spinner::before{
+                content: "▴";
+                position: absolute;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                right: 0;
+                top: 0;
+                width: 1.5em;
+                height: 50%;
+                background: lightgray;
+                font-size: 0.7em;
+            }
+
+            .newMockElement.spinner::after, .mockElement.spinner::after{
+                content:"▾";
+                position: absolute;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                right: 0px;
+                bottom: 0px;
+                width: 1.5em;
+                height: 50%;
+                background: lightgray ;
+                font-size: 0.7em;
+                box-sizing: border-box;
+                padding-bottom: 0.2em;
+                border-top: 1px solid gray;
+            }
+
+
+            /*slider*/
+            .newMockElement.slider,
+            .mockElement.slider{
+                align-items: center;
+                display:flex;
+            }
+
+            .newMockElement.slider:before,
+            .mockElement.slider::before{
+                content:" ";
+                height:0.5em;
+                width:0.5em;
+                background: white;
+                border: 3px solid #333;
+                border-radius: 10em;
+                position: relative;
+                left:3em;
+            }
+
+            .newMockElement.slider:after,
+            .mockElement.slider::after{
+                content:" ";
+                height: 2px;
+                background: #222;
+                width:100%;
+            }
+            /*loading indicator*/
+            .newMockElement.loadingIndicator,
+            .mockElement.loadingIndicator{
+                border: 1px solid gray;
+                border-radius: 2px;
+                background-color: white;
+                padding: 0;
+                justify-content: center;
+                align-items: center;
+                display: flex;
+                position: relative
+            }
+
+            .newMockElement.loadingIndicator .bar,
+            .mockElement.loadingIndicator .bar{
+                margin: 0;
+                background-color: rgba(0, 0, 0, 0.21);
+                width: 70%;
+                display: block;
+                position: absolute;
+                height: 100%;
+                top: 0;
+                left: 0;
+                text-align: center;
+            }
+
+            /*entries vertical*/
+            .newMockElement.entries-horizontal, .mockElement.entries-horizontal{
+                background: white;
+                width:15em;
+            }
+
+            .newMockElement.entries-horizontal .editableArea, .mockElement.entries-horizontal .editableArea{
+                background: white;
+                box-sizing: border-box;
+                width:100%;
+                height: 100%;
+                margin:0;
+            }
+
+            .newMockElement.entries-horizontal .editableArea ul, .mockElement.entries-horizontal .editableArea ul{
+                box-sizing: border-box;
+                width:100%;
+                height: 100%;
+                margin:0;
+                padding:0;
+                display: table;
+                border-collapse: collapse;
+            }
+
+            .newMockElement.entries-horizontal ul li, .mockElement.entries-horizontal ul li{
+                display: table-cell;
+                padding: 0.2em;
+                border: 1px solid gray;
+                border-collapse: collapse;
+                margin: 0;
+                font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            .mockElement.entries-horizontal ul li.item-highlighted{
+                background: #DDD;
+            }
+
+            /*entries horizontal*/
+            .newMockElement.entries-vertical, .mockElement.entries-vertical{
+                background: white;
+                width:30em;
+            }
+
+            .newMockElement.entries-vertical .editableArea, .mockElement.entries-vertical .editableArea{
+                background:white;
+                box-sizing: border-box;
+                width:100%;
+                height: 100%;
+                margin:0;
+            }
+
+            .newMockElement.entries-vertical .editableArea ul, .mockElement.entries-vertical .editableArea ul{
+                box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .newMockElement.entries-vertical ul li, .mockElement.entries-vertical ul li{
+                margin: 0px;
+                font-family: "Comic Sans MS","Comic Sans",cursive;
+                width: 150px;
+                padding: 0.2em;
+                flex: 1 1 100%;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid rgb(128, 128, 128);
+                border-collapse: collapse;
+                margin-top: -1px;
+            }
+
+            .mockElement.entries-vertical ul li.item-highlighted{
+                background: #DDD;
+            }
+
+
+            /*boxes vertical*/
+            .newMockElement.boxes-horizontal, .mockElement.boxes-horizontal{
+                background: rgba(0,0,0,0);
+                width:15em;
+            }
+
+            .newMockElement.boxes-horizontal .editableArea, .mockElement.boxes-horizontal .editableArea{
+                background: rgba(0,0,0,0);
+                box-sizing: border-box;
+                width:100%;
+                height: 100%;
+                margin:0;
+            }
+
+            .newMockElement.boxes-horizontal .editableArea ul, .mockElement.boxes-horizontal .editableArea ul{
+                box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+                display: flex;
+                flex-direction: row;
+            }
+
+            .newMockElement.boxes-horizontal ul li, .mockElement.boxes-horizontal ul li{
+                padding: 0.2em;
+                border: 1px solid rgb(128, 128, 128);
+                font-family: "Comic Sans MS","Comic Sans",cursive;
+                margin: 0.2em;
+                display: flex;
+                flex: 1 1 auto;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mockElement.boxes-horizontal ul li.item-highlighted{
+                background: #DDD;
+            }
+
+            /*boxes vertical*/
+            .newMockElement.boxes-vertical, .mockElement.boxes-vertical{
+                background: rgba(0,0,0,0);
+                width:10em;
+            }
+
+            .newMockElement.boxes-vertical .editableArea, .mockElement.boxes-vertical .editableArea{
+                background: rgba(0,0,0,0);
+                box-sizing: border-box;
+                width:100%;
+                height: 100%;
+                margin:0;
+            }
+
+            .newMockElement.boxes-vertical .editableArea ul, .mockElement.boxes-vertical .editableArea ul{
+                box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .newMockElement.boxes-vertical ul li, .mockElement.boxes-vertical ul li{
+                margin: 1.5% 0 0 0;
+                font-family: "Comic Sans MS","Comic Sans",cursive;
+                width: 99%;
+                padding: 0.2em;
+                flex: 1 1 100%;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid rgb(128, 128, 128);
+                border-collapse: collapse;
+            }
+
+            .mockElement.boxes-vertical ul li.item-highlighted{
+                background: #DDD;
+            }
+
+            /*iconbar*/
+
+
+            .newMockElement.boxes-iconbar-horizontal ul>li, .mockElement.boxes-iconbar-horizontal ul>li{
+                border: 2px solid rgb(128, 128, 128);
+                display: flex;
+                justify-content: center;
+                font-size: 1.7em;
+                align-items: center;
+                border-radius: 3px;
+                color: rgb(51, 51, 51);
+                flex: 1 1 0%;
+                margin: 0.1em;
+                padding: 0.1em 0.1em 0.2em;
+                background: white;
+            }
+            .newMockElement.boxes-iconbar-horizontal ul>li{
+                min-width: 1em;
+            }
+
+            /*image placeholder*/
+            .newMockElement.imageplaceholder, .mockElement.imageplaceholder{
+                color:darkgray;
+                background-color: lightgray;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                height:5em;
+            }
+
+            /*actual image*/
+            .newMockElement.actualimage, .mockElement.actualimage{
+                height:5em;
+            }
+
+            .mockElement.actualimage>p{
+                background: lightgray;
+                color:gray;
+            }
+
+            .mockElement.actualimage img{
+                width:100%;
+                height:100%;
+            }
+
+
+            /*meta: note*/
+            .newMockElement.note, .mockElement.note{
+                background: #f7ee9e;
+                background: linear-gradient(to bottom, #f7ee9e 0%,#e0d68f 99%);
+                border: 0px none;
+                box-shadow: 5px 5px 7px rgba(0, 0, 0, 0.4);
+                transform: rotate(-3deg);
+                width:150px;
+                height:150px;
+            }
+
+            .newMockElement.note > *, .mockElement.note > *{
+                transform: rotate(3deg); /*so the text is not rotated*/
+            }
+
+            .newMockElement.note .editableArea, .mockElement.note .editableArea{
+                padding:0.5em;
+            }
+
+            /*Meta: arrow note*/
+            .newMockElement.arrownote, .mockElement.arrownote{
+                background: #f7ee9e;
+                border: 0px none;
+                box-shadow: 5px 5px 7px rgba(0, 0, 0, 0.4);
+                width:150px;
+                height:30px;
+            }
+
+            .newMockElement.arrownote .editableArea, .mockElement.arrownote .editableArea{
+                padding:0.2em;
+            }
+
+            .newMockElement.arrownote::before, .mockElement.arrownote::before{
+                width: 0;
+                height: 0;
+                margin-left:-15px;
+                margin-top:0px;
+                border-style: solid;
+                border-width: 15px 15px 15px 0;
+                border-color: transparent #eae193 transparent transparent;
+                content:"";
+                position:absolute
+            }
+
+            .newMockElement.note .editableArea, .mockElement.note .editableArea{
+                padding:0.5em;
+            }
+        </style>
+    </head>
+
+    <body __wid="j6vaDVU8" style="cursor: auto;">
+        <div id="appContainer" __wid="fMYfSE2f">
+            <div id="widgetCollectionWrap" __wid="5xtyuUtR">
+                <ul id="widgetCollection" __wid="iDaQQcQT">
+                    <!--
+    
+                                    Tentative Description for creating elements:
+    
+                                            In each list Element goes a div. This Div is the Interface Element which can be dragged to the canvas.
+                                            Each element has the class "newMockElement". This is changed to "mockElement" when it is added to the cavas.
+                                            Also each element can have other classes.
+    
+                                            In the Div there can be other nested elements.
+    
+                                            One of these elements *can* hold text that can be edited.  This is done by adding the attribute "data-editablearea" to this element.
+    
+                                            The way the text is edited can be customized, by adding the attribute data-editable-mode= to it. The attribute can have the following values: "markdown", "uielements", "plain". If you set nothing, markdown is assumed.
+    
+                                            markdown: Is markdown with a table extension and the possibility to create radiobuttons via "(x)" and checkboxes via [x]
+                                            uielements: for creating lists where the items are seperated by a ";". List items can highlighted (item-highlighted class is added to the <li> element) by adding a "*" in front: "normal; normal; *I am Active; normal item again; …"
+                                            plain: plain text
+    
+                                            DO: give your element an additional (aside the newMockupElement) class: "newMockupElement fooBarClass".
+    
+                                            DO: Use ">" (direct child) instead of the " " (descendant operator); If elements are nested it can have strange side effects since the nested element will have styles that it did not have before.
+    
+                                            DONT:
+                                            * give the element an id. The id is set by the script.
+    
+                    -->
+
+                    <li title="button" __wid="9fuvstSY">
+                        <div class="newMockElement button" data-editable-content="OK" data-editable-mode="plain" __wid="tJHb255R">
+                            <span class="editableArea" __wid="UzqHVtNb">OK</span>
+                        </div>
+                    </li>
+                    <li title="tabs" __wid="AZaWMv6g"><!-- Tabs -->
+                        <div class="newMockElement tabs" data-editable-content="Tab1;*Tab2; Tab3" data-editable-mode="uielements" __wid="3g9xeJfV">
+                            <div class="editableArea" __wid="3sutHX88">
+                                <ul __wid="KUrGZxVj">
+                                    <li __wid="5aCGmGBa">Tab1</li>
+                                    <li class="item-highlighted" __wid="gUpsS2CQ">Tab2</li>
+                                    <li __wid="jZJ9yfE8">Tab3</li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </li>
+                    <li title="Short text label" __wid="CAVX4kPx">
+                        <div class="newMockElement label" data-editable-content="label" data-editable-mode="plain" __wid="BJeyXjhB">
+                            <div class="editableArea" __wid="7b7rxHJn">Label</div>
+                        </div>
+                    </li>
+                    <li title="a link" __wid="RGLYffat">
+                        <div class="newMockElement link" data-editable-content="link" data-editable-mode="plain" __wid="EPFLr7ZC">
+                            <div class="editableArea" __wid="rFmv2wFs">Link</div>
+                        </div>
+                    </li>
+                    <li title="checkbox list" __wid="E3DtLw32">
+                        <div class="newMockElement optionCheckbox" data-editable-content="option; *other option" data-editable-mode="uielements" __wid="jLwkQ9UN">
+                            <div class="editableArea" __wid="v6vwX7FZ">
+                                <ul __wid="2975VCJb">
+                                    <li __wid="m9ZJ4Dj7">option</li>
+                                    <li class="item-highlighted" __wid="uhsJaxCK">other option</li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </li>
+                    <li title="radio-button list" __wid="GSNZFcFn">
+                        <div class="newMockElement optionRadiobutton" data-editable-content="option; *other option" data-editable-mode="uielements" __wid="8vGNC9x4">
+                            <div class="editableArea" __wid="SJS8TCSh">
+                                <ul __wid="yawtnvJm">
+                                    <li __wid="EXGjtFCT">option</li>
+                                    <li class="item-highlighted" __wid="XxUeetjL">other option</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li title="dropdown element" __wid="b65AGHSi">
+                        <div class="newMockElement dropdownList" data-editable-content="DropdownTitle" data-editable-mode="plain" __wid="scxWzAQ4">
+                            <span class="editableArea" __wid="hqxH74y4">Dropdown Title</span><span class="mockelement-dropdown-arrow" __wid="i5vsWLXd">▾</span>
+                        </div>
+                    </li>
+                    <li title="spinner element" __wid="22NzQ9ff">
+                        <div class="newMockElement spinner" data-editable-content="10" data-editable-mode="plain" __wid="iYP5yhjR">
+                            <span class="editableArea" __wid="9PZmAK48">10</span>
+                        </div>
+                    </li>
+                    <li title="slider element" __wid="k2pSq7Ki">
+                        <div class="newMockElement slider" __wid="nbyfSz3w">
+                            <span __wid="zKAry44U"> </span>
+                        </div>
+                    </li>
+                    <li __wid="7efYFv9E">
+                        <div class="newMockElement loadingIndicator" __wid="8kAVP6w5">
+                            <div class="bar" __wid="aRJvjKHr"></div>
+                            70%
+                        </div>
+                    </li>
+                    <li __wid="XRJPtJXp">
+                        <div class="newMockElement headline" data-editable-content="headline1" data-editable-mode="plain" __wid="62eQTs8t">
+                            <h1 class="editableArea" __wid="RdzQsDCp">Headline1</h1>
+                        </div>
+                    </li>
+                    <li title="Markdown-editable paragraph" __wid="djejwAYn">
+                        <div class="newMockElement paragraph" data-editable-content="
+                             Paragraph
+                             (Markdown **Supported** !)" __wid="xi3iF7Xi">
+                            <div class="editableArea" __wid="xCmMF9Sh">
+                                Paragraph
+                                (Markdown<strong __wid="e4irDhyF"> Supported</strong>!)
+                            </div>
+                        </div>
+                    </li>
+                    <li title="markdown table" __wid="m4dpLNV4">
+                        <div class="newMockElement table" data-editable-content="
+                             | h1    | h2      |      h3 |
+                             |:------|:-------:|--------:|
+                             | lorem | ipsum   | dolor   |
+                             | first | second  | third   |
+                             " __wid="kz6St7id">
+                            <div class="editableArea" __wid="KndXBnLR">
+                                <table __wid="d9zF3M7R">
+                                    <thead __wid="UbGsrQ6g">
+                                        <tr __wid="eemtgbm8">
+                                            <th style="text-align: left;" __wid="a5vBQ4Za">h1</th>
+                                            <th style="text-align: center;" __wid="LzAQT39B">h2</th>
+                                            <th style="text-align: right;" __wid="JDbnid5s">h3</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody __wid="9cTMbiBx">
+                                        <tr __wid="csC396WR">
+                                            <td style="text-align: left;" __wid="DbmRB9Gx">lorem</td>
+                                            <td style="text-align: center;" __wid="6vVjMS5X">ipsum</td>
+                                            <td style="text-align: right;" __wid="dZh7YKVm">dolor</td>
+                                        </tr>
+
+                                        <tr __wid="tePCT32x">
+                                            <td style="text-align: left;" __wid="4LcwsUsp">first</td>
+                                            <td style="text-align: center;" __wid="Hrc8U3y6">second</td>
+                                            <td style="text-align: right;" __wid="rzWGEyVY">third</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </li>
+                    <li title="simple OS window" __wid="QYnJppk6"><!-- Dialog Window -->
+                        <div class="newMockElement dialogWindow" data-editable-content="myWindow" data-editable-mode="plain" __wid="tqWhFFWH">
+                            <div class="dialogWindow-bar" __wid="mvbVHSyQ">
+                                <span class="editableArea" __wid="7thrU8iD">Title</span>
+                                <span class="dialogWindow-closeButton" __wid="4xUYL7eX">×</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li title="a rectangle" __wid="4kDDAcLj">
+                        <div class="newMockElement rect" __wid="d8NnadnS">
+                        </div>
+                    </li>
+                    <li title="a gray rectangle" __wid="AEn3uMkc">
+                        <div class="newMockElement grayrect" __wid="vNwwVb3Z">
+                        </div>
+                    </li>
+                    <li title="an invisible rectangle" __wid="4ydvtiQH">
+                        <div class="newMockElement invisiblerect" __wid="qBvmLLMi">
+                            <div class="desc" __wid="NEsEY2Li">Invisible Rect<br __wid="tx9MJcuh"/>Use for grouping</div>
+                        </div>
+                    </li>
+                    <li title="horizontal list" __wid="Hkx2GQp2">
+                        <div class="newMockElement entries-horizontal" data-editable-content="Entry1;Entry2;*Entry3" data-editable-mode="uielements" __wid="L7kPrZWd">
+                            <div class="editableArea" __wid="fK9T4Uq4">
+                                <ul __wid="E4BbXRa7">
+                                    <li __wid="tEC6Gu3P">Entry1</li>
+                                    <li __wid="CNipnxBC">Entry2</li>
+                                    <li class="item-highlighted" __wid="5pG3vCbV">Entry3</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li title="vertical list" __wid="PJT8ZThD">
+                        <div class="newMockElement entries-vertical" data-editable-content="Entry1;Entry2;*Entry3" data-editable-mode="uielements" __wid="Uj6GUW3c">
+                            <div class="editableArea" __wid="UGb79NVS">
+                                <ul __wid="KhTKv5V7">
+                                    <li __wid="XY28F9rM">Entry1</li>
+                                    <li __wid="HQeh6ZHV">Entry2</li>
+                                    <li class="item-highlighted" __wid="aXMJ5YPL">Entry3</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li title="horizontal boxes list (e.g. for toolbars)" __wid="7VXqAjqW">
+                        <div class="newMockElement boxes-horizontal" data-editable-content="Entry1;Entry2;*Entry3" data-editable-mode="uielements" __wid="ZYnZicND">
+                            <div class="editableArea" __wid="ZQ2MJxS9">
+                                <ul __wid="nAR7mjrn">
+                                    <li __wid="HtFrRT2q">Entry1</li>
+                                    <li __wid="MFMFBknK">Entry2</li>
+                                    <li class="item-highlighted" __wid="4pkRssXD">Entry3</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li title="vertical boxes list (e.g. for toolbars)" __wid="s7d5Fx9w">
+                        <div class="newMockElement boxes-vertical" data-editable-content="Entry1;Entry2;*Entry3" data-editable-mode="uielements" __wid="wZC6zDqM">
+                            <div class="editableArea" __wid="erXpN2eu">
+                                <ul __wid="hYV2cPxK">
+                                    <li __wid="crEFtiZr">Entry1</li>
+                                    <li __wid="AuW6PyNx">Entry2</li>
+                                    <li class="item-highlighted" __wid="eMC8zWsm">Entry3</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li title="horizontal boxes for toolbars" __wid="Gs24ZCEs">
+                        <div class="newMockElement boxes-horizontal boxes-iconbar-horizontal" data-editable-content="☰;⌂;⚑; ⚙; ✂;✐;✔;✘;↶;↷;◂;▸; ▴;▾" data-editable-mode="uielements" __wid="Z7r7RX6R">
+                            <div class="editableArea" __wid="vwSwwBfE">
+                                <ul __wid="92hmDFVS">
+                                    <li __wid="48YcFhUY">☰</li>
+                                    <li __wid="yJsdp7q9">⌂</li>
+                                    <li __wid="SnsGmsrn">⚑</li>
+                                    <li __wid="ZjGFkJWn"> ⚙</li>
+                                    <li __wid="Sym2TkQZ"> ✂</li>
+                                    <li __wid="me8xyjdF">✐</li>
+                                    <li __wid="58nAHiTz">✔</li>
+                                    <li __wid="JnGp96Q4">✘</li>
+                                    <li __wid="jFuuQ8uM">↶</li>
+                                    <li __wid="9mmuSh2u">↷</li>
+                                    <li __wid="sSKjJkfk">◂</li>
+                                    <li __wid="sJEXrxdf">▸</li>
+                                    <li __wid="5ZyAvyjz"> ▴</li>
+                                    <li __wid="yYe9wjx2">▾</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li title="image placeholder" __wid="VvLVc6Eg">
+                        <div class="newMockElement imageplaceholder" data-editable-content="Image" data-editable-mode="plain" __wid="L4jzGLLp">
+                            <div class="editableArea" __wid="tyvFZFXR">
+                                Image
+                            </div>
+                        </div>
+                    </li>
+
+                    <li title="add markdown link to image" __wid="6N3DWAtZ">
+                        <div class="newMockElement actualimage" data-editable-content="![]()<!-- add URL to image in the round brackets -->" data-editable-mode="markdown" __wid="Athpgwi2">
+                            <div class="editableArea" __wid="GDSBvbuV">
+                                Image (double click to add markdown link to image)
+                            </div>
+                        </div>
+                    </li>
+
+                    <li title="Markdown-editable sticky note" __wid="Qj7NNyPM">
+                        <div class="newMockElement meta-element note" data-editable-content="Notes here!" data-editable-mode="markdown" __wid="vtsE6PVT">
+                            <div class="editableArea" __wid="ptXDXKvw">
+                            </div>
+                        </div>
+                    </li>
+
+                    <li title="editable sticky arrow-note" __wid="rkxVJsBC">
+                        <div class="newMockElement meta-element arrownote" data-editable-content="Notes here!" data-editable-mode="plain" __wid="7hGiLBtr">
+                            <div class="editableArea" __wid="3vQNHW24">
+                                note!
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div id="canvasWrap" __wid="88e6SApm">
+                <div style="height: 2000px; width: 2000px;" class="ui-droppable" id="canvas" __wid="Paq4yDbu">
+                    <!-- this is example content-->
+
+
+
+                    
+                    
+                    
+                <div id="mockElement_18339765751247" style="position: absolute; top: 267px; left: 668px; z-index: auto; width: 201px; right: auto; height: 60px; bottom: auto;" class="meta-element arrownote ui-draggable ui-draggable-handle mockElement ui-resizable ui-droppable" data-editable-content="Clique e arraste os elementos para começar!" data-editable-mode="plain" __wid="g5xHJ37L">
+                        <div id="editableArea_18339765751247" class="editableArea" __wid="jiSPGjAX">Clique e arraste os elementos para começar!</div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                    <div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;" __wid="yLUvZvGP"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;" __wid="rMPVqvxh"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;" __wid="bCZHruBP"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;" __wid="9vBBfyJW"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;" __wid="WdQ8NTXz"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;" __wid="TpA5snM6"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;" __wid="pxPTxccL"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;" __wid="X3huPpLm"></div></div><div id="mockElement_44991636269813" style="position: absolute; top: 391.941px; left: 658.866px; z-index: auto; width: 227px; right: auto; height: 146px; bottom: auto;" class="meta-element note ui-draggable ui-draggable-handle mockElement ui-resizable ui-droppable" data-editable-content="Delete
+                         elementos usando a tecla &quot;<strong>Delete</strong>&quot; no seu teclado, ou o botão na barra de ferramentas. 
+                         Se seu espaço acabar, basta clicar no botão &quot;<strong>Redimensionar</strong>&quot;" data-editable-mode="markdown" __wid="BQCLgdY8">
+                        <div id="editableArea_44991636269813" class="editableArea" __wid="mUqhTCfD"><p __wid="nHa2adXn">Delete
+                         elementos usando a tecla "<strong __wid="c5DL4Bap">Delete</strong>" no seu teclado, ou o botão na barra de ferramentas. 
+                         Se seu espaço acabar, basta clicar no botão "<strong __wid="bczsH8Qr">Redimensionar</strong>"</p></div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+
+                    <div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;" __wid="RiTuARbJ"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;" __wid="PWNN3ZEF"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;" __wid="AQTEkPuq"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;" __wid="iC5VgnWb"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;" __wid="tWCRsftJ"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;" __wid="HuMcHYX5"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;" __wid="cveD6jgm"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;" __wid="bMnUcJb4"></div></div><div id="mockElement_64002219983074" style="position: absolute; top: 47.6784px; left: 354.848px; z-index: 0; width: 304px; right: auto; height: 172px; bottom: auto;" class="meta-element note ui-draggable ui-draggable-handle mockElement ui-resizable ui-droppable" data-editable-content=" Não há gerenciamento de camadas ou empilhamento, nem seleção de múltiplos elementos.
+                         Os elementos são agrupados ao arrastar um elemento sobre o outro.
+                         Elementos agrupados são movidos com seus elementos-pai" data-editable-mode="markdown" __wid="7VYZX2Yv">
+                        <div id="editableArea_64002219983074" class="editableArea" __wid="j6REtfGR"><p __wid="gQB3RERB">Não há gerenciamento de camadas ou empilhamento, nem seleção de múltiplos elementos.
+                         Os elementos são agrupados ao arrastar um elemento sobre o outro.
+                         Elementos agrupados são movidos com seus elementos-pai</p></div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+
+                    <div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;" __wid="tGw9wM8t"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;" __wid="NWZSGPvH"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;" __wid="ZVmxxXQV"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;" __wid="6eYLMXS2"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;" __wid="ewYZRLup"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;" __wid="6nGz29Qt"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;" __wid="6UdAqaHk"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;" __wid="CpWJjjGq"></div></div></div>
+            </div>
+
+            <div id="toolbar" __wid="vXiPyYhs">
+                <input type="file" id="loadFile" style="display: none;" __wid="Zjiwng9D"/>
+                <button id="newFile" class="btn btn-default btn-sm m2" __wid="h9tsy7EG"><i class="fas fa-file" __wid="crp6EWXd"></i> New</button>
+                <button id="loadFileButton" class="btn btn-default btn-sm m2" __wid="QFKyrQha"><i class="fas fa-folder-open" __wid="cUXw9gm8"></i> Open</button>
+                <button id="saveFile" class="btn btn-default btn-sm m2" __wid="aeWEV93m"><i class="fas fa-save" __wid="PdGLrRyx"></i> Save</button>
+
+                <button class="btn btn-default btn-sm m2 delete-element-button" title="deletes the currently selected element (del)" __wid="JKGFiQ5A"><i class="fas fa-times" __wid="mExJ2jXp"></i> Delete Element</button>
+                <button class="btn btn-default btn-sm m2 undelete-element-button" title="undeletes most recently deleted element (Ctrl+Z)" __wid="HCbY7eBH"><i class="fas fa-undo-alt" __wid="aJDkyHu5"></i>  Undo delete</button>
+                <button class="btn btn-default btn-sm m2 duplicate-element-button" title="duplicates currently selected element (Ctrl+D)" __wid="wM2gFZK5"><i class="fas fa-clone" __wid="ikx8mTKp"></i>  Duplicate Element</button>
+                <button class="btn btn-default btn-sm m2 change-canvasize-button" title="change size of the area you place elements on" __wid="8Y9DRyaC"><i class="fas fa-expand" __wid="rhfb5NsP"></i> Change Canvas Size</button>
+            </div>
+
+
+            <div id="changeCanvasSizeDialog" class="dialog" __wid="qtjx5E7c">
+                <p __wid="zU2wKex3">Change the size of the Canvas</p>
+                <label __wid="BwYi3bWZ">Width:<br __wid="mDuv9Nwh"/><input type="text" name="width" __wid="42uSy29H"/></label><br __wid="BC3cantC"/>
+                <label __wid="u8dLqhWb">Height:<br __wid="GAh4Wb4n"/><input type="text" name="height" __wid="zhq42VH7"/></label>
+            </div>
+        </div>
+
+
+    
+    <script src="http://localhost/quickMockup/scripts/webedit.js" __wid="3skxFWLd"></script>
+
+
+</body></html>

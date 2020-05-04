@@ -1,0 +1,82 @@
+<html __wid="RSD8mpfJ"><head __wid="GY4haKxX">
+	<title __wid="ZULzjdeP">shared_notes</title>
+
+	<style id="style-main" __wid="HZrv96vs">
+		.note {
+			position: absolute;
+			left: 8px;
+			top: 8px;
+			width: 400px;
+			min-height: 400px;
+			padding: 16px;
+			box-shadow: 5px 5px 10px gray;
+			background-color: rgb(255, 255, 150);
+			font-size: 24pt;
+			word-wrap: break-word;
+		}
+
+		.note:focus {
+			outline: none;
+			box-shadow: 15px 15px 20px gray;
+		}
+	</style>
+	<script id="script-main" __wid="UaPWDapU">
+		var edited = null; //The note currently edited
+		var dragged = null; //The note currently dragged
+		var offset = { x: 0, y: 0 }; //Offset from mouse when dragging
+
+		// Add event listerner for the webstrate being loaded
+		webstrate.on("loaded", function () {
+
+			// If the user double-clicks a note then make it editable and give it focus.
+			document.addEventListener("dblclick", function (e) {
+				var note = e.target.closest(".note");
+				if (note) {
+					edited = note;
+					note.setAttribute("contenteditable", true);
+					note.focus();
+				}
+			});
+
+			// If the user clicks anywhere other than on the edited note, disable editing.
+			document.addEventListener("click", function (e) {
+				if (!edited || e.target.closest(".note") === edited) return;
+				edited.setAttribute("contenteditable", false);
+				edited = null;
+			});
+
+			// On a mouse-down event, check if the target is a note, if so store it and its offset from the mouse.
+			document.addEventListener("mousedown", function (e) {
+				var target = e.target.closest(".note");
+				if (target === null) return;
+				if (edited) return; // If we are editing, we want to disable dragging.
+				dragged = target;
+				var style = getComputedStyle(dragged);
+				offset.x = e.clientX - parseInt(style.getPropertyValue("left"));
+				offset.y = e.clientY - parseInt(style.getPropertyValue("top"));
+			});
+
+			// On a mouse-move event, check if something is dragged, if so position it relative to the stored offset.
+			document.addEventListener("mousemove", function (e) {
+				if (dragged === null) return;
+				if (edited) return;
+				var left = e.clientX - offset.x;
+				var top = e.clientY - offset.y;
+				dragged.setAttribute("style", "left: " + left + "px; top:" + top + "px;");
+			});
+
+			document.addEventListener("mouseup", function (e) {
+				dragged = null;
+			});
+		});
+	</script>
+</head>
+
+<body __wid="5Q9z73sJ">
+	<div class="note" contenteditable="false" __wid="BBUesTGe" style="left: 64px; top:31px;">saddfdsdd111<div __wid="2FRcDqY5">dsd</div>
+		<div __wid="GxLPkUkr"><br __wid="piBxhqm5"/></div>
+		<div __wid="5MiFcsPi">aaaaaaa</div>
+	</div>
+
+
+<div class="note" __wid="yTEZnmrp" style="left: 625px; top:6px;" contenteditable="false">abcdef</div><div class="note" __wid="ZTpXnwvw">nova</div><div class="note" __wid="YyQy5Ncz" style="left: 155px; top:40px;">Pelo cel</div><div class="note" __wid="8WaMfGFq" style="left: 472px; top:100px;">eeee</div></body></html>

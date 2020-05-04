@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<body>
+<p>Loading Webstrates</p>
+<div class="spinner"></div>
+<style type="text/css" media="screen">
+body {
+	font-family: sans-serif;
+	font-weight: 200;
+	-webkit-font-smoothing: antialiased;
+	text-align: center;
+	margin-top: 15%;
+	animation: fadein 1s;
+}
+@keyframes fadein {
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+.spinner {
+	width: 40px;
+	height: 40px;
+	margin: 0 auto;
+	background-color: #31a46f;
+	animation: rotateplane 1.2s infinite ease-in-out;
+}
+@keyframes rotateplane {
+	0% { transform: perspective(120px) rotateX(0deg) rotateY(0deg); }
+	50% { transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg); }
+	100% { transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); }
+}
+</style>
+<script src="/webstrates.js?{{hash}}"></script>
+</body></html>

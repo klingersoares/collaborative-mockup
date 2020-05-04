@@ -47,6 +47,10 @@ return [
             'driver' => 'local',
             'root' => storage_path('app'),
         ],
+        'webstrates' => [
+            'driver' => 'local',
+            'root' => base_path('Webstrates'),
+        ],
 
         'public' => [
             'driver' => 'local',
