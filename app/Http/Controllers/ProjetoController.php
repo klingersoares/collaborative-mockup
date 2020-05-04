@@ -26,7 +26,6 @@ class ProjetoController extends Controller {
         File::copyDirectory(Storage::disk('webstrates')->path('') . $caminhoTemplate, Storage::disk('webstrates')->path('') . $nomeProjeto);
         
         
-        Storage::disk('webstrates')->put();
         //  dd();
         // $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60
         $process = new Process(['webstratesfs', '--id=' . $nomeProjeto, '--insecure'], Storage::disk('webstrates')->path(''));
