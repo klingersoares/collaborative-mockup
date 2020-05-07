@@ -20,6 +20,35 @@
                 </div>
 
                 <div class="card-body">
+                    @if(count($projetos))  
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th style="width:40%">Nome</th>
+                                <th>Criado em</th>
+                                <th>Papel</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($projetos as $projeto)
+                                <tr>
+                                    <td>{{$projeto->nome}}</td>
+                                    <td>{{Carbon\Carbon::parse($projeto->created_at)->format('d/m/Y')}}</td>
+                                    <td>{{$projeto->tipo == 'P'?'Proprietário':'Colaborador'}}</td>
+                                    <td>
+                                        <a href="{{route('editarProjeto',$projeto->url)}}"  class="btn btn-outline-secondary btn-sm">
+                                            <i class="fa fa-edit"></i>
+                                            Editar
+                                        </a>
+                                    </td>
+                                </tr>                            
+                            @endforeach
+                        </tbody>
+                    </table>
+
+
+                    @endif
 
                 </div>
             </div>

@@ -15,4 +15,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/home', 'HomeController@index')->name('home');
     Route::post('/novoProjeto', 'ProjetoController@novoProjeto')->name('novoProjeto');
+    
+    Route::group(['prefix' => 'editor'], function () {
+        Route::get('/{id}', 'ProjetoController@editarProjeto')->name('editarProjeto');
+        Route::post('/salvarAlteracao', 'ProjetoController@salvarAlteracao')->name('salvarAlteracao');
+    });
 });

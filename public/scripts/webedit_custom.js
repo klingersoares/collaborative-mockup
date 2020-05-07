@@ -56,7 +56,7 @@ var makeDropableElement = function (element) {
         hoverClass: "drop-hover",
         drop: function (event, ui) {
             //calculate offset of both
-
+            saveUserAction();
             var elementToAppend = null;
 
             if (ui.draggable.hasClass("newMockElement")) {//if this is a new element
@@ -84,7 +84,7 @@ var makeDropableElement = function (element) {
             var newLeft = draggableOffset.left - droppableOffset.left;
             var newTop = draggableOffset.top - droppableOffset.top;
 
-            webstrate.dataSaved().then(()=>{
+            webstrate.dataSaved().then(() => {
                 if (ui.draggable.hasClass("newMockElement")) {
                     elementToAppend.appendTo($(this)).css({ top: newTop + "px", left: newLeft + "px" });
                 } else {
@@ -432,11 +432,21 @@ webstrate.on("loaded", function () {
     totalElementos = $(".mockElement").length;
 });
 
-$('body').on('DOMSubtreeModified', '#canvasWrap', function(){
+$('body').on('DOMSubtreeModified', '#canvasWrap', function () {
     if ($(".mockElement").length > totalElementos) {
         totalElementos = $(".mockElement").length;
-        setTimeout(function(){
+        setTimeout(function () {
             setupElements();
         }, 4);
     }
 });
+
+function saveUserAction(){
+    var data = {
+        'pid': window.location.pathname
+    }
+    window.parent.postMessage({
+        'func': 'salvarAlteracao',
+        'message':data
+    }, "*");
+}
