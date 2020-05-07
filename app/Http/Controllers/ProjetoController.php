@@ -41,7 +41,7 @@ class ProjetoController extends Controller {
         $process = new Process(['webstratesfs', '--id=' . $urlProjeto, '--insecure'], Storage::disk('webstrates')->path(''));
         // $process = new Process(['sh', 'test.sh']);
         $process->run(function () use ($process) {
-            // sleep(5);
+            sleep(5);
             $process->stop(10, 1);
         });
 
