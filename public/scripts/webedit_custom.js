@@ -1,4 +1,23 @@
 var totalElementos = 0;
+var authorized = false;
+showLoader();
+if (window.addEventListener) {
+    window.addEventListener("message", onMessage, false);
+}
+else if (window.attachEvent) {
+    window.attachEvent("onmessage", onMessage, false);
+}
+
+function onMessage(event) {
+    if (event.origin !== "http://localhost" && event.origin !== "http://ec2-18-218-105-113.us-east-2.compute.amazonaws.com") {
+        return false;
+    }
+    var data = event.data;
+    if (typeof (window[data.func]) == "function") {
+        data.origin = event.origin;
+        window[data.func].call(null, data);
+    }
+}
 
 var setupElements = function () {
 
@@ -92,10 +111,10 @@ var makeDropableElement = function (element) {
                 }
             });
             // if(element.hasOwnProperty('webstrate') ){
-            //     console.log('--------------------------------------------------------------------------------')
-            //     element.webstrate.on('nodeAdded*', function (node, local) {
-            //         console.log('eeeeeeeeeeeeeee')
-            //     })
+                console.log('--------------------------------------------------------------------------------')
+                element.webstrate.on('nodeAdded*', function (node, local) {
+                    console.log('eeeeeeeeeeeeeee')
+                })
             // }
         }
     });//droppable End
@@ -288,7 +307,7 @@ var deleteElement = (function () { //revealing module pattern
     })
 
     $('#newFile').click(function () {
-        if (window.confirm('are you sure you want to start new sketch? unsaved changes to current sketch will be lost, unless you save them first.')) {
+        if (window.confirm('are you sure you want to clear your design? unsaved changes to current design will be lost, unless you save them first.')) {
             var $canvas = $("#canvas").empty();
         }
     });
@@ -303,9 +322,9 @@ var deleteElement = (function () { //revealing module pattern
 
 
     // prevent navigating away by accident
-    window.onbeforeunload = function () {
-        return "do you want to close the application? Unsaved changes will be lost (use your browsers save function for saving)"
-    };
+    // window.onbeforeunload = function () {
+    //     return "do you want to close the application? Unsaved changes will be lost (use your browsers save function for saving)"
+    // };
 
     //        $('<button title="exports to codepen. »Save« on codepen to get a sharable URL">↗ to Codepen</button>').
     //                appendTo("#toolbar").
@@ -430,7 +449,27 @@ function saveDocumentCode() {
 webstrate.on("loaded", function () {
     setupElements();
     totalElementos = $(".mockElement").length;
+    getAuthorization();
+    setTimeout(function(){
+        if(!authorized){
+             //alert('unauthorized');
+             location.href = 'unauthorized'
+             window.close();
+        }else{
+            hideLoader();
+        }
+    },100);
 });
+webstrate.on("clientJoin",function(e){
+alert('sadf')
+})
+
+function receiveMessage(event) {
+    console.log(event)
+    if (event.loggedIn) {
+        authorized = true;
+    }
+}
 
 $('body').on('DOMSubtreeModified', '#canvasWrap', function () {
     if ($(".mockElement").length > totalElementos) {
@@ -441,12 +480,28 @@ $('body').on('DOMSubtreeModified', '#canvasWrap', function () {
     }
 });
 
-function saveUserAction(){
+function saveUserAction() {
     var data = {
         'pid': window.location.pathname
     }
     window.parent.postMessage({
         'func': 'salvarAlteracao',
-        'message':data
+        'message': data
     }, "*");
+}
+function getAuthorization() {
+    var data = {
+        'pid': window.location.pathname
+    }
+    window.parent.postMessage({
+        'func': 'getAuthorization',
+        'message': data
+    }, "*");
+}
+
+function showLoader() {
+    $('body').append("'<div id='cover-spin'></div>'")
+}
+function hideLoader() {
+    $('#cover-spin').remove();
 }

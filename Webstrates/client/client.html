@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
 <body>
-<p>Loading Webstrates</p>
-<div class="spinner"></div>
+<p>Loading document</p>
+<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
 <style type="text/css" media="screen">
 body {
 	font-family: sans-serif;
@@ -12,21 +12,60 @@ body {
 	margin-top: 15%;
 	animation: fadein 1s;
 }
-@keyframes fadein {
-	0% { opacity: 0; }
-	100% { opacity: 1; }
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
 }
-.spinner {
-	width: 40px;
-	height: 40px;
-	margin: 0 auto;
-	background-color: #31a46f;
-	animation: rotateplane 1.2s infinite ease-in-out;
+.lds-ellipsis div {
+  position: absolute;
+  top: 33px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #80b7d2;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
-@keyframes rotateplane {
-	0% { transform: perspective(120px) rotateX(0deg) rotateY(0deg); }
-	50% { transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg); }
-	100% { transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); }
+.lds-ellipsis div:nth-child(1) {
+  left: 8px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 8px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 32px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 56px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
 }
 </style>
 <script src="/webstrates.js?{{hash}}"></script>

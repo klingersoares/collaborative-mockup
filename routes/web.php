@@ -15,9 +15,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/', 'HomeController@index')->name('home');
     Route::get('/home', 'HomeController@index')->name('home');
     Route::post('/novoProjeto', 'ProjetoController@novoProjeto')->name('novoProjeto');
+    Route::post('/colaborarProjeto', 'ProjetoController@colaborarProjeto')->name('colaborarProjeto');
     
     Route::group(['prefix' => 'editor'], function () {
-        Route::get('/{id}', 'ProjetoController@editarProjeto')->name('editarProjeto');
+        Route::get('/project/{id}', 'ProjetoController@editarProjeto')->name('editarProjeto');
+        Route::get('/verificarSessao', 'ProjetoController@verificarSessao')->name('verificarSessao');
         Route::post('/salvarAlteracao', 'ProjetoController@salvarAlteracao')->name('salvarAlteracao');
     });
 });

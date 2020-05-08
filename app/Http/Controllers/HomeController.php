@@ -24,7 +24,7 @@ class HomeController extends Controller {
     public function index() {
 
         $projetos = Projeto::join('tbl_projeto_user', 'tbl_projeto.id', 'tbl_projeto_user.idProjeto')
-                            ->where('tbl_projeto_user.idUser', '=', Auth::user()->id)->get();
+                            ->where('tbl_projeto_user.idUser', '=', Auth::user()->id)->orderBy('tbl_projeto.nome')->get();
 
         return view('home',['projetos'=>$projetos]);
     }

@@ -1,22 +1,22 @@
-<div id="modalNovoProjeto" class="modal fade" tabindex="-1" role="dialog">
+<div id="modalColaborar" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Criar Novo Projeto</h5>
+        <h5 class="modal-title">Colaborar em um projeto</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-	  	<form action="{{route('novoProjeto')}}" method="POST" id="formNovo">
+	  	<form action="{{route('colaborarProjeto')}}" method="POST" id="formColaborar">
 			<div class="modal-body">
 				@csrf
 				<div class="col-12">
-					<label for="nomeProjeto" class="control-label" >Nome do Projeto:</label>
-					<input type="text" class="form-control" name="nomeProjeto" id="nomeProjeto" required=required />
+					<label for="nomeProjeto" class="control-label" >Chave do projeto:</label>
+					<input type="text" class="form-control" name="chaveColaboracao" id="chaveColaboracao" required=required />
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="submit" id="submitNovo" class="btn btn-primary"><i class="fa fa-check"></i>Criar Projeto</button>
+				<button type="submit" id="submitColaborar" class="btn btn-primary"><i class="fa fa-check"></i>Colaborar</button>
 				<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-close"></i>Cancelar</button>
 			</div>
 		</form>	

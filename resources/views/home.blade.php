@@ -12,7 +12,7 @@
                             <i class="fa fa-file-o" aria-hidden="true"></i>
                             Novo Projeto
                         </button>
-                        <button class="btn btn-primary btn-sm">
+                        <button class="btn btn-primary btn-sm" id="btnColaborar">
                             <i class="fa fa-users" aria-hidden="true"></i>
                             Colaborar
                         </button>
@@ -21,12 +21,13 @@
 
                 <div class="card-body">
                     @if(count($projetos))  
-                    <table class="table table-condensed">
+                    <table class="table table-condensed " style="font-size: 12px;">
                         <thead>
                             <tr>
                                 <th style="width:40%">Nome</th>
                                 <th>Criado em</th>
                                 <th>Papel</th>
+                                <th></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -41,13 +42,16 @@
                                             <i class="fa fa-edit"></i>
                                             Editar
                                         </a>
+                                        <a data-chave="{{$projeto->url}}" data-toggle="tooltip" title="Clique para gerar chave de colaboração"  class="btn btn-link btn-sm btnChave">
+                                            <i class="fa fa-user-plus"></i>
+                                        </a>
                                     </td>
                                 </tr>                            
                             @endforeach
                         </tbody>
                     </table>
-
-
+                    @else
+                        <div class="alert text-center"><h4>Você ainda não tem nenhum projeto</h4></div>
                     @endif
 
                 </div>
@@ -56,6 +60,7 @@
     </div>
 </div>
 @include('modais.novoProjeto')
+@include('modais.colaborarProjeto')
 @endsection
 
 @section('scripts')
@@ -64,6 +69,20 @@
         $('#btnNovo').click(function() {
             $('#modalNovoProjeto').modal('show');
         });
+        $('#btnColaborar').click(function() {
+            $('#modalColaborar').modal('show');
+        });
+        $('.btnChave').click(function() {
+            var txt = `<h4 class="text-center">Compartilhe a chave abaixo com os usuários que deseja convidar para colaborar</h4>
+                        <p class="alert alert-primary pt-2 text-center">${$(this).attr("data-chave")}</p>`;
+            bootbox.alert(txt);
+        }); $('#formNovo').submit(function() {
+            showLoader();
+        });
+        $('#formColaborar').submit(function() {
+            showLoader();
+        });
     });
+   
 </script>
 @endsection

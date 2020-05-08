@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Projeto;
 use App\ProjetoUser;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -15,7 +16,7 @@ class ProjetoController extends Controller {
     public function novoProjeto(Request $request) {
 
         if ($request->get('nomeProjeto') == '') {
-            return redirect(back(302));
+            return redirect('home')->with(['message' => 'Nome do projeto é obrigatório', 'type' => 'error']);
         }
 
         $urlProjeto = 'proj_' . $request->get('nomeProjeto') . md5(time());
@@ -28,9 +29,8 @@ class ProjetoController extends Controller {
         ProjetoUser::create([
             'idProjeto' => $projeto->id,
             'idUser' => Auth::user()->id,
-            'tipo' => 'P'
+            'tipo' => 'P',
         ]);
-
 
         $caminhoTemplate = env('APP_ENV') == 'production' ? 'template_projeto' : 'template_dev';
 
@@ -52,24 +52,86 @@ class ProjetoController extends Controller {
         // }
 
         // dd($process->getOutput());
-
-        return redirect(env('URL_EDITOR') . $urlProjeto);
+        return redirect(route('editarProjeto', $projeto->url));
+        //return redirect(env('URL_EDITOR') . $urlProjeto);
 
     }
 
-    public function editarProjeto($idProjeto){
-        return view('editor',['urlProjeto'=>env('URL_EDITOR').$idProjeto]);
+    public function colaborarProjeto(Request $request) {
+
+        try {
+
+            if ($request->get('chaveColaboracao') == '') {
+                return redirect('home')->with(['message' => 'Chave do projeto é obrigatório', 'type' => 'error']);
+            }
+
+            $projeto = Projeto::where([
+                'url' => $request->get('chaveColaboracao'),
+            ])->first();
+
+            if ($projeto == null) {
+                throw new \Exception('Erro! Projeto não encontrado');
+            }
+            $projetoUser = ProjetoUser::where([
+                'idProjeto' => $projeto->id,
+                'idUser' => Auth::user()->id,
+            ])->first();
+
+            if ($projetoUser != null) {
+                throw new \Exception('Você já está colaborando no projeto ' . $projeto->nome);
+            }
+
+            ProjetoUser::create([
+                'idProjeto' => $projeto->id,
+                'idUser' => Auth::user()->id,
+                'tipo' => 'C',
+            ]);
+
+            return redirect(route('editarProjeto', $projeto->url));
+
+        } catch (\Exception $e) {
+            return redirect('home')->with(['message' => $e->getMessage(), 'type' => 'error']);
+        }
+
+    }
+    public function editarProjeto($idProjeto) {
+        try {
+
+            $projeto = Projeto::join('tbl_projeto_user', 'tbl_projeto.id', 'tbl_projeto_user.idProjeto')
+                ->where('tbl_projeto_user.idUser', Auth::user()->id)
+                ->where('tbl_projeto.url', $idProjeto)
+                ->first();
+
+            if ($projeto == null) {
+                return redirect('home')->with(['message' => 'Você não possui permissão nesse projeto', 'type' => 'error']);
+            }
+
+            $data = [
+                'urlProjeto' => env('URL_EDITOR') . $idProjeto,
+                'projeto' => $projeto,
+            ];
+
+            return view('editor', $data);
+        } catch (Exception $e) {
+            return redirect('home')->with(['message' => $e->getMessage(), 'type' => 'error']);
+        }
+
     }
 
-    public function salvarAlteracao(Request $request){
-        try{
+    public function salvarAlteracao(Request $request) {
+        try {
 
             dd($request->get('pid'));
 
+        } catch (\Exception $e) {
 
-
-        }catch(\Exception $e){
-
+        }
+    }
+    public function verificarSessao() {
+        try {
+            return response()->json([true], 200);
+        } catch (\Exception $e) {
+            return response()->json([false], 401);
         }
     }
 
