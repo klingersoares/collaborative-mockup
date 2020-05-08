@@ -110,12 +110,6 @@ var makeDropableElement = function (element) {
                     setupElements();
                 }
             });
-            // if(element.hasOwnProperty('webstrate') ){
-                console.log('--------------------------------------------------------------------------------')
-                element.webstrate.on('nodeAdded*', function (node, local) {
-                    console.log('eeeeeeeeeeeeeee')
-                })
-            // }
         }
     });//droppable End
 };//droppableWrapper End
@@ -461,7 +455,7 @@ webstrate.on("loaded", function () {
     },100);
 });
 webstrate.on("clientJoin",function(e){
-alert('sadf')
+console.log('client join')
 })
 
 function receiveMessage(event) {
