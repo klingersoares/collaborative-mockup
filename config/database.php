@@ -77,6 +77,11 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'dsn' => 'mongodb://localhost:27017',
+            'database' => env('MONGO_DATABASE', 'logs_collaborative_mockup'),
+        ],
 
     ],
 

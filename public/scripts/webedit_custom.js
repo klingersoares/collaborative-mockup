@@ -29,6 +29,9 @@ var setupElements = function () {
         setupElement(element);
     });
 
+
+
+
     //make new sidebar elements draggabe
     $(".newMockElement").draggable({
         distance: 4,
@@ -63,10 +66,28 @@ var makeMovableElement = function (element) {
     }).resizable({
         handles: "all"
     });
+
+    $('.editableArea').each(function (index, element) {
+        $(element).off('leaveEditing');
+        $(element).on('leaveEditing', function (e) {
+
+            console.log($(e.target).parent());
+
+            var dataLog = {
+                element: $(e.target).parent().classes()[0],
+                elementId: $(e.target).parent().attr('id'),
+                text: e.target.textContent,
+                event: 'textoComponenteAlterado',
+            }
+            saveUserAction(dataLog);
+        });
+    });
 };
 
 
 var makeDropableElement = function (element) {
+
+    $(element).droppable({ drop: null });
 
     $(element).droppable({
         accept: ".mockElement, .newMockElement",
@@ -75,10 +96,12 @@ var makeDropableElement = function (element) {
         hoverClass: "drop-hover",
         drop: function (event, ui) {
             //calculate offset of both
-            saveUserAction();
+
             var elementToAppend = null;
+            var action = null;
 
             if (ui.draggable.hasClass("newMockElement")) {//if this is a new element
+                action = 'componenteAdicionado';
                 elementToAppend = ui.draggable.clone(false);
                 elementToAppend.removeClass("newMockElement");
 
@@ -94,16 +117,29 @@ var makeDropableElement = function (element) {
 
                 setupElement(elementToAppend);
             } else {
+                action = 'componenteMovido';
                 elementToAppend = ui.draggable;
             }
+            console.log(elementToAppend)
+
+            var offsetCanvas = $('#canvasWrap').offset();
 
             var draggableOffset = ui.helper.offset(); //was ui.draggable
             var droppableOffset = $(this).offset();
 
             var newLeft = draggableOffset.left - droppableOffset.left;
             var newTop = draggableOffset.top - droppableOffset.top;
+            var newLeftFromCanvas = draggableOffset.left - offsetCanvas.left;
+            var newTopFromCanvas = draggableOffset.top - offsetCanvas.top;
 
+            var dataLog = {
+                element: elementToAppend.classes()[0],
+                elementId: elementToAppend.attr('id'),
+                position: { left: newLeftFromCanvas, top: newTopFromCanvas },
+                event: action,
+            }
             webstrate.dataSaved().then(() => {
+                saveUserAction(dataLog);
                 if (ui.draggable.hasClass("newMockElement")) {
                     elementToAppend.appendTo($(this)).css({ top: newTop + "px", left: newLeft + "px" });
                 } else {
@@ -181,11 +217,37 @@ var duplicateElement = function () {
     clonedElement.removeClass("custom-selected");
     clonedElement.appendTo($element2BDuplicated.parent());
 
+    var offsetCanvas = $('#canvasWrap').offset();
+
     clonedElement.find(".mockElement").each(function (index, element) {
         setupElement(element);
+
+        action = 'componenteAdicionado';
+        element = $(element);
+        var elementPos = element.position();
+        var newLeftFromCanvas = elementPos.left + offsetCanvas.top;
+        var newTopFromCanvas = elementPos.top + offsetCanvas.top;
+        var dataLog = {
+            element: element.classes()[0],
+            elementId: element.attr('id'),
+            position: { left: newLeftFromCanvas, top: newTopFromCanvas },
+            event: action,
+        }
+        saveUserAction(dataLog);
     });
     setupElement(clonedElement);
+    action = 'componenteAdicionado';
+    var clonedElementPos = clonedElement.position();
+    var newLeftFromCanvas = clonedElementPos.left;
+    var newTopFromCanvas = clonedElementPos.top - offsetCanvas.top;
 
+    var dataLog = {
+        element: clonedElement.classes()[0],
+        elementId: clonedElement.attr('id'),
+        position: { left: newLeftFromCanvas, top: newTopFromCanvas },
+        event: action,
+    }
+    saveUserAction(dataLog);
 };
 
 var deleteElement = (function () { //revealing module pattern
@@ -201,6 +263,13 @@ var deleteElement = (function () { //revealing module pattern
             var $canvas = $(canvasSelector);
             var $element2BDeleted = $canvas.find(element2BDeletedSelector);
 
+            var dataLog = {
+                element: $element2BDeleted.classes()[0],
+                elementId: $element2BDeleted.attr('id'),
+                event: 'componenteDeletado',
+            }
+            saveUserAction(dataLog);
+
             recentlyDeleted.$formerParent = $element2BDeleted.parent(); //remember parent for re-attachment on redo
             recentlyDeleted.$element = $element2BDeleted.detach(); //delete element and store it  for re-attachment on redo
         },
@@ -211,6 +280,13 @@ var deleteElement = (function () { //revealing module pattern
             }
 
             recentlyDeleted.$formerParent.append(recentlyDeleted.$element);
+
+            var dataLog = {
+                element: recentlyDeleted.$element.classes()[0],
+                elementId: recentlyDeleted.$element.attr('id'),
+                event: 'componenteDeletadoRestaurado',
+            }
+            saveUserAction(dataLog);
         }
     };
 }());
@@ -303,6 +379,10 @@ var deleteElement = (function () { //revealing module pattern
     $('#newFile').click(function () {
         if (window.confirm('are you sure you want to clear your design? unsaved changes to current design will be lost, unless you save them first.')) {
             var $canvas = $("#canvas").empty();
+            var dataLog = {
+                event: 'todosComponentesRemovidos',
+            }
+            saveUserAction(dataLog);
         }
     });
 
@@ -408,6 +488,10 @@ $("#loadFile").fileReaderJS({//fixme: can we make this class as elementgetter?
         load: function (e, file) {
             appendJqueryToQuickmockupDom(readStringToJquery(e.target.result)); //ugly!!!
             setupElements();
+            var dataLog = {
+                event: 'carregadoHtmlExterno',
+            }
+            saveUserAction(dataLog);
         }
     }
 });
@@ -436,6 +520,10 @@ function saveDocumentCode() {
     var documentstring = document.documentElement.outerHTML;
     var blob = new Blob([documentstring], { type: "text/plain;charset=utf-8" });
     saveAs(blob, "" + year + month + day + "mockup.html");
+    var dataLog = {
+        event: 'exportadoHtml',
+    }
+    saveUserAction(dataLog);
 }
 
 //START
@@ -444,18 +532,18 @@ webstrate.on("loaded", function () {
     setupElements();
     totalElementos = $(".mockElement").length;
     getAuthorization();
-    setTimeout(function(){
-        if(!authorized){
-             //alert('unauthorized');
-             location.href = 'unauthorized'
-             window.close();
-        }else{
+    setTimeout(function () {
+        if (!authorized) {
+            //alert('unauthorized');
+            location.href = 'unauthorized'
+            window.close();
+        } else {
             hideLoader();
         }
-    },100);
+    }, 500);
 });
-webstrate.on("clientJoin",function(e){
-console.log('client join')
+webstrate.on("clientJoin", function (e) {
+    console.log('client join')
 })
 
 function receiveMessage(event) {
@@ -474,10 +562,8 @@ $('body').on('DOMSubtreeModified', '#canvasWrap', function () {
     }
 });
 
-function saveUserAction() {
-    var data = {
-        'pid': window.location.pathname
-    }
+function saveUserAction(data) {
+    data.project = window.location.pathname.replace(/\//g, '');
     window.parent.postMessage({
         'func': 'salvarAlteracao',
         'message': data
@@ -499,3 +585,23 @@ function showLoader() {
 function hideLoader() {
     $('#cover-spin').remove();
 }
+; !(function ($) {
+    $.fn.classes = function (callback) {
+        var classes = [];
+        $.each(this, function (i, v) {
+            var splitClassName = v.className.split(/\s+/);
+            for (var j = 0; j < splitClassName.length; j++) {
+                var className = splitClassName[j];
+                if (-1 === classes.indexOf(className)) {
+                    classes.push(className);
+                }
+            }
+        });
+        if ('function' === typeof callback) {
+            for (var i in classes) {
+                callback(classes[i]);
+            }
+        }
+        return classes;
+    };
+})(jQuery);

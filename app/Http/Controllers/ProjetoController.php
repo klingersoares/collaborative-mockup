@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\MongoModels\Log;
 use App\Projeto;
 use App\ProjetoUser;
 use Exception;
@@ -20,6 +21,7 @@ class ProjetoController extends Controller {
         }
 
         $urlProjeto = 'proj_' . $request->get('nomeProjeto') . md5(time());
+        $urlProjeto = preg_replace("/[^a-zA-Z0-9]+/", "", $urlProjeto);
 
         $projeto = Projeto::create([
             'nome' => $request->get('nomeProjeto'),
@@ -50,7 +52,14 @@ class ProjetoController extends Controller {
         //     dd($process->getOutput());
         //     throw new ProcessFailedException($process);
         // }
+        $dadosLog = [
+            'event' => 'projetoCriado',
+            'project' => $projeto->url,
+            'userName' => Auth::user()->name,
+            'userId' => Auth::user()->id,
+        ];
 
+        $log = Log::create($dadosLog);
         // dd($process->getOutput());
         return redirect(route('editarProjeto', $projeto->url));
         //return redirect(env('URL_EDITOR') . $urlProjeto);
@@ -111,6 +120,13 @@ class ProjetoController extends Controller {
                 'projeto' => $projeto,
             ];
 
+            $dadosLog = [
+                'event' => 'acessoProjeto',
+                'project' => $projeto->url,
+                'userName' => Auth::user()->name,
+                'userId' => Auth::user()->id,
+            ];
+            $log = Log::create($dadosLog);
             return view('editor', $data);
         } catch (Exception $e) {
             return redirect('home')->with(['message' => $e->getMessage(), 'type' => 'error']);
@@ -121,10 +137,15 @@ class ProjetoController extends Controller {
     public function salvarAlteracao(Request $request) {
         try {
 
+            $dadosLog = $request->all() + ['userId' => Auth::user()->id, 'userName' => Auth::user()->name];
+
+            $log = Log::create($dadosLog);
+
+            return response()->json([$log]);
             dd($request->get('pid'));
 
         } catch (\Exception $e) {
-
+            dd($e);
         }
     }
     public function verificarSessao() {

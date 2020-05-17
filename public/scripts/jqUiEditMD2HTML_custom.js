@@ -139,7 +139,7 @@ webstrate.on("loaded", function () {
 					remove();
 
 				this._on(this.element, { "dblclick": this._goToEditMode });
-
+				$(this.element).find(".editableArea").first().trigger('leaveEditing',[this]);
 				this._trigger("leaveEditing");
 			}
 		});
