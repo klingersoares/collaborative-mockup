@@ -16,6 +16,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/home', 'HomeController@index')->name('home');
     Route::post('/novoProjeto', 'ProjetoController@novoProjeto')->name('novoProjeto');
     Route::post('/colaborarProjeto', 'ProjetoController@colaborarProjeto')->name('colaborarProjeto');
+    Route::get('/logs/{id}', 'ProjetoController@verLogs')->name('verLogs');
     
     Route::group(['prefix' => 'editor'], function () {
         Route::get('/project/{id}', 'ProjetoController@editarProjeto')->name('editarProjeto');

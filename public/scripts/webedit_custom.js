@@ -140,11 +140,11 @@ var makeDropableElement = function (element) {
             }
             webstrate.dataSaved().then(() => {
                 saveUserAction(dataLog);
-                if (ui.draggable.hasClass("newMockElement")) {
+                // if (ui.draggable.hasClass("newMockElement")) {
                     elementToAppend.appendTo($(this)).css({ top: newTop + "px", left: newLeft + "px" });
-                } else {
+                // } else {
                     setupElements();
-                }
+                // }
             });
         }
     });//droppable End

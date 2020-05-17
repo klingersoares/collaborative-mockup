@@ -45,6 +45,9 @@
                                         <a data-chave="{{$projeto->url}}" data-toggle="tooltip" title="Clique para gerar chave de colaboração"  class="btn btn-link btn-sm btnChave">
                                             <i class="fa fa-user-plus"></i>
                                         </a>
+                                        <a data-chave="{{$projeto->url}}" data-toggle="tooltip" title="Baixar logs"  class="btn btn-link btn-sm btnLog">
+                                            <i class="fa fa-file-text"></i>
+                                        </a>
                                     </td>
                                 </tr>                            
                             @endforeach
@@ -65,6 +68,7 @@
 
 @section('scripts')
 <script>
+    _rotaLogs = "{{route('verLogs',':id')}}";
     $(document).ready(function(){
         $('#btnNovo').click(function() {
             $('#modalNovoProjeto').modal('show');
@@ -76,7 +80,12 @@
             var txt = `<h4 class="text-center">Compartilhe a chave abaixo com os usuários que deseja convidar para colaborar</h4>
                         <p class="alert alert-primary pt-2 text-center">${$(this).attr("data-chave")}</p>`;
             bootbox.alert(txt);
-        }); $('#formNovo').submit(function() {
+        }); 
+        $('.btnLog').click(function() {
+           var projeto = $(this).attr('data-chave');
+            var w = window.open(_rotaLogs.replace(':id',projeto),'Logs');
+        }); 
+        $('#formNovo').submit(function() {
             showLoader();
         });
         $('#formColaborar').submit(function() {
